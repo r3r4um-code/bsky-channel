@@ -55,13 +55,13 @@ export const blueskyPlugin: ChannelPlugin<ResolvedBlueskyAccount> = {
     },
   },
   outbound: {
-    deliveryMode: "direct",
+    deliveryMode: "direct" as const,
     textChunkLimit: 300,
-    resolveTarget: ({ to }) => {
+    resolveTarget: ({ to }: { to?: string }) => {
       // For Bluesky, target is optional - we always post to the authenticated user's timeline
       return { ok: true, to: to?.trim() || "" };
     },
-    sendText: async ({ cfg, to, text, accountId }) => {
+    sendText: async ({ cfg, to, text, accountId }: { cfg: any; to: string; text: string; accountId?: string }) => {
       const account = await resolveBlueskyAccount({
         cfg: cfg as OpenClawConfig,
         accountId: accountId ?? undefined,
@@ -69,10 +69,11 @@ export const blueskyPlugin: ChannelPlugin<ResolvedBlueskyAccount> = {
       if (!account.configured) {
         throw new Error("Bluesky account not configured");
       }
-      return await sendMessageBluesky({
+      const result = await sendMessageBluesky({
         account,
         text,
       });
+      return { channel: "bluesky", ...result };
     },
   },
   probe: async ({ cfg, accountId }: any) => {
