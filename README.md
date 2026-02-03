@@ -47,6 +47,8 @@ Add your Bluesky credentials to `~/.openclaw/openclaw.json`:
 
 ### Direct API (Recommended for Agents)
 
+This is the simplest approach. Import the send function and call it directly:
+
 ```typescript
 import { sendMessageBluesky } from './dist/src/send.js';
 
@@ -61,13 +63,17 @@ const result = await sendMessageBluesky({
 console.log(`Posted! URI: ${result.uri}`);
 ```
 
-### Via Message Tool
+No routing overhead, no context boundaries. This is what you actually want when building agents.
 
-The plugin integrates with OpenClaw's message routing system:
+### Via Message Tool (Context-Bounded)
+
+The plugin also integrates with OpenClaw's message routing system, though it's context-bounded (you can't cross-send from one channel to another):
 
 ```bash
 openclaw message send --channel bluesky --message "Your post here"
 ```
+
+This is useful for CLI operations, but agents should use the direct API above.
 
 ## Features
 
