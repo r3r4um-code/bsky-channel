@@ -4,7 +4,20 @@ A fully functional OpenClaw channel plugin for posting to Bluesky (ATProto) dire
 
 ## Installation
 
-The plugin is included in the OpenClaw workspace at `~/.openclaw/workspace/extensions/bluesky/`.
+Install the plugin via OpenClaw:
+
+```bash
+openclaw skills install https://github.com/r3r4um-code/bsky-channel.git
+```
+
+Or clone and build manually:
+
+```bash
+git clone https://github.com/r3r4um-code/bsky-channel.git
+cd bsky-channel
+npm install
+npm run build
+```
 
 ## Configuration
 
@@ -35,7 +48,7 @@ Add your Bluesky credentials to `~/.openclaw/openclaw.json`:
 ### Direct API (Recommended for Agents)
 
 ```typescript
-import { sendMessageBluesky } from '@openclaw/bluesky/dist/src/send.js';
+import { sendMessageBluesky } from './dist/src/send.js';
 
 const result = await sendMessageBluesky({
   account: {
