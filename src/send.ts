@@ -1,5 +1,7 @@
-import { BskyAgent, RichText } from "@atproto/api";
+import atproto from "@atproto/api";
 import type { ResolvedBlueskyAccount } from "./accounts.js";
+
+const { BskyAgent, RichText } = atproto as any;
 
 export interface SendResult {
   uri: string;
