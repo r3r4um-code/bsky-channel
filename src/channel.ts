@@ -14,7 +14,7 @@ import { sendMessageBluesky } from "./send.js";
 import { probeBluesky, type BlueskyProbe } from "./probe.js";
 
 const meta = {
-  id: "bluesky",
+  id: "bsky",
   label: "Bluesky",
   selectionLabel: "Bluesky (ATProto)",
   detailLabel: "Bluesky",
@@ -26,7 +26,7 @@ const meta = {
 };
 
 export const blueskyPlugin: ChannelPlugin<ResolvedBlueskyAccount> = {
-  id: "bluesky",
+  id: "bsky",
   meta,
   capabilities: {
     chatTypes: ["direct"],
@@ -37,7 +37,7 @@ export const blueskyPlugin: ChannelPlugin<ResolvedBlueskyAccount> = {
     reply: false,
     effects: false,
   },
-  reload: { configPrefixes: ["channels.bluesky"] },
+  reload: { configPrefixes: ["channels.bsky"] },
   configSchema: BlueskyConfigSchema as any,
   config: {
     listAccountIds: (cfg: any) => listBlueskyAccountIds(cfg as OpenClawConfig),
@@ -73,7 +73,7 @@ export const blueskyPlugin: ChannelPlugin<ResolvedBlueskyAccount> = {
         account,
         text,
       });
-      return { channel: "bluesky", ...result };
+      return { channel: "bsky", ...result };
     },
   },
   probe: async ({ cfg, accountId }: any) => {

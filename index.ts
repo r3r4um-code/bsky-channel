@@ -5,7 +5,7 @@ import { blueskyPlugin } from "./src/channel.js";
 export { sendMessageBluesky } from "./src/send.js";
 
 const plugin: any = {
-  id: "bluesky",
+  id: "bsky",
   name: "Bluesky",
   description: "Bluesky (ATProto) channel plugin",
   configSchema: emptyPluginConfigSchema(),
