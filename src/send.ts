@@ -1,11 +1,13 @@
 import atproto from "@atproto/api";
 import type { ResolvedBlueskyAccount } from "./accounts.js";
+import { saveAndSignPost } from "./sign-and-commit.js";
 
 const { BskyAgent, RichText } = atproto as any;
 
 export interface SendResult {
   uri: string;
   cid: string;
+  verifyUrl?: string;
 }
 
 export async function sendMessageBluesky({
@@ -21,8 +23,15 @@ export async function sendMessageBluesky({
     password: account.appPassword,
   });
 
+  // Sign and commit the post before sending
+  const { shortUrl } = await saveAndSignPost(text);
+
+  // Append verification link to the post
+  const verifyLink = `\n\n🔐 Verify: ${shortUrl}`;
+  const fullText = text + verifyLink;
+
   // Create richtext and detect facets (mentions, links, etc)
-  const rt = new RichText({ text });
+  const rt = new RichText({ text: fullText });
   await rt.detectFacets(agent);
 
   const response = await agent.post({
@@ -34,5 +43,6 @@ export async function sendMessageBluesky({
   return {
     uri: response.uri,
     cid: response.cid,
+    verifyUrl: shortUrl,
   };
 }
