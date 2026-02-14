@@ -10,6 +10,9 @@ export interface SendResult {
   verifyUrl?: string;
 }
 
+const MAX_POST_LENGTH = 201; // chars, leaving room for verification link (~99 chars)
+const VERIFY_OVERHEAD = 99; // "🔐 Verify: " + 86-char URL
+
 export async function sendMessageBluesky({
   account,
   text,
@@ -17,6 +20,14 @@ export async function sendMessageBluesky({
   account: ResolvedBlueskyAccount;
   text: string;
 }): Promise<SendResult> {
+  // Validate post length before processing
+  if (text.length > MAX_POST_LENGTH) {
+    throw new Error(
+      `Post text too long: ${text.length} chars (max ${MAX_POST_LENGTH}). ` +
+      `Total with verification link will be ${text.length + VERIFY_OVERHEAD} chars (limit 300).`
+    );
+  }
+
   const agent = new BskyAgent({ service: "https://bsky.social" });
   await agent.login({
     identifier: account.identifier,
