@@ -1,7 +1,6 @@
 import { execSync } from "child_process";
 import fs from "fs";
 import path from "path";
-import crypto from "crypto";
 
 const POSTS_REPO = path.join(
   process.env.HOME || "/home/maurerit",
@@ -85,62 +84,25 @@ export async function saveAndSignPost(text: string): Promise<{
 }
 
 /**
- * Create a git.io short URL for a full GitHub URL
+ * Create a GitHub short URL using 7-char commit hash
+ * GitHub accepts shortened URLs and redirects to full commit
  */
 async function createGitioShortUrl(fullUrl: string): Promise<string> {
   try {
-    // git.io API: POST to https://git.io with the URL
-    // Use a custom shortcode instead of auto-generating
-    const match = fullUrl.match(/blob\/([a-f0-9]+)\/posts\/(.+\.gpg)/);
+    // Extract commit hash and build short URL
+    const match = fullUrl.match(/blob\/([a-f0-9]+)\//);
     if (!match) {
       throw new Error("Could not extract commit hash from URL");
     }
     
-    const shortcode = `bsky-${match[2].replace(/\D/g, "").slice(0, 8)}`;
+    const fullHash = match[1];
+    const shortHash = fullHash.substring(0, 7);
+    const shortUrl = fullUrl.replace(fullHash, shortHash);
     
-    const response = await fetch("https://git.io", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-      body: `url=${encodeURIComponent(fullUrl)}&shortcode=${encodeURIComponent(shortcode)}`,
-      redirect: "manual",
-    });
-
-    if (response.status === 201) {
-      const location = response.headers.get("location");
-      if (location) {
-        console.log(`✅ git.io short URL created: ${location}`);
-        return location;
-      }
-    }
-
-    // If shortcode is taken, fall back to auto-generated
-    if (response.status === 422) {
-      console.log(`⚠️  Shortcode taken, trying auto-generated...`);
-      const autoResponse = await fetch("https://git.io", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/x-www-form-urlencoded",
-        },
-        body: `url=${encodeURIComponent(fullUrl)}`,
-        redirect: "manual",
-      });
-
-      if (autoResponse.status === 201) {
-        const location = autoResponse.headers.get("location");
-        if (location) {
-          console.log(`✅ git.io auto-short URL created: ${location}`);
-          return location;
-        }
-      }
-    }
-
-    // Last resort: use the full GitHub URL (it's not that long)
-    console.warn(`⚠️  git.io unavailable, using full GitHub URL`);
-    return fullUrl;
+    console.log(`✅ GitHub short URL: ${shortUrl}`);
+    return shortUrl;
   } catch (err) {
-    console.error("❌ Error creating git.io short URL:", err);
+    console.error("❌ Error creating short URL:", err);
     // Fall back to full URL
     return fullUrl;
   }
